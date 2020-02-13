@@ -1,11 +1,18 @@
 import { Entity, PrimaryGeneratedColumn, Column, Generated, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import {IsEmail} from "class-validator";
 
+class ConfirmationEmailExpiredError extends Error {
+}    
 
-// TypeORM tutorial 
+
+class ConfirmationEmailWrongToken extends Error {
+}    
+
 
 @Entity()
 export class User {
+
+    static EMAIL_CONFIRMATION_TIMEOUT_SECONDS = 3*24*3600;
 
    // This is what we use internally as a foreign key, but never expose to the public because leaking user counts is 
    // a company trade secrets issue 
@@ -17,11 +24,11 @@ export class User {
    // We assume all servers tick UTC, but we always preserve timezone for 
    // our sanity when something gets messy   
    @CreateDateColumn({ type: 'timestamptz', name: 'create_date', default: () => 'LOCALTIMESTAMP' })
-   createdAt: string;
+   createdAt: Date;
    
    // Nice columns for internal statistics and diagnostics
    @UpdateDateColumn({ type: 'timestamptz', name: 'update_date', default: () => 'LOCALTIMESTAMP' })
-   updatedAt: string;
+   updatedAt: Date;
  
    // Already refer users by this id when in the APIs .
    // (Randomized public ids make data exposure safer)
@@ -43,13 +50,18 @@ export class User {
    @IsEmail()
    pendingEmail: string;
 
+   // Set after the email verification completes
+   @Column({length: 8, nullable: true})
+   @IsEmail()
+   emailConfirmationToken: string;
+
     // When the user registerd / requested email change
     @Column({ type: 'timestamptz', nullable: false })
-    emailConfirmationRequestedAt: string;
+    emailConfirmationRequestedAt: Date;
 
     // When the user registerd / requested email change
     @Column({ type: 'timestamptz', nullable: true})
-    emailConfirmationCompletedAt: string;
+    emailConfirmationCompletedAt: Date;
     
     // TODO: Phone number field
 
@@ -57,5 +69,32 @@ export class User {
     // as asking a truly safe password management routines 
     // from the candidates would be overkill.
     // But please read here: https://github.com/miohtama/opsec/blob/master/source/user/effective-session-kill.rst
+
+    // Can this user login - the email registratoin is valid
+    canLogIn(): boolean { 
+        return this.emailConfirmationCompletedAt != null;
+    }
+
+    // Make user to confirm their account on registration
+    confirmEmail(email: string, token: string, now_:Date = null) {
+
+        // Allow override time for testing
+        if(!now_) {
+            now_ = new Date();
+        }
+
+        // Shitscript is shit, standard datetime sucks and no arithmetic methods
+        if(now_ > new Date(this.emailConfirmationRequestedAt.getTime() + User.EMAIL_CONFIRMATION_TIMEOUT_SECONDS)) {
+            throw new ConfirmationEmailExpiredError();
+        }
+
+        if(token != this.emailConfirmationToken) {
+            throw new ConfirmationEmailWrongToken();
+        }
+
+        this.confirmedEmail = this.pendingEmail;
+        this.emailConfirmationCompletedAt = now_;
+        this.emailConfirmationToken = null; 
+    }
 
 }
