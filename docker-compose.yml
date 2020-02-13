@@ -6,12 +6,13 @@ services:
 
   # https://hub.docker.com/_/postgres
   postgres:
-    image: postgres:alpine
+    image: postgres:11
     container_name: local_db
     restart: always
     environment:
-      - DB_USER=local_dev
-      - DB_PASS=local_dev
+      - POSTGRES_USER=local_dev
+      - POSTGRES_PASSWORD=local_dev
+      - POSTGRES_DB=local_db
     ports: 
       - 54320:5432
     volumes:

@@ -1,0 +1,24 @@
+/**
+ * What users themselves get back from the API
+ */
+
+export class UserPublic {
+    readonly displayName: string;
+    readonly email: string;
+    readonly publidId: string;    
+}
+
+/**
+ * What user sees about himself/herself
+ */
+export class UserOwn extends UserPublic{
+    readonly confirmedEmail: number;
+}
+
+/**
+ * Admin model for the user, displays all fields.
+ */
+export class UserAdmin extends UserOwn {
+    readonly createadAt: string;
+    readonly updatedAt: string;
+}
