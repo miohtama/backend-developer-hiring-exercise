@@ -109,6 +109,12 @@ docker exec -it local_db psql -U local_dev -c "create database e2e_test" local_d
 npm run test:e2e
 ```
 
+Running a single test
+
+```bash
+npm run test:e2e -- -t "GET /users"
+```
+
 # test coverage
 $ npm run test:cov
 ```
@@ -139,7 +145,7 @@ docker-compose down -v
 
 # NestJS - TypeORM shortcomings
 
-- No standard way to create PostgreSQL db/tear down db for the tests (Python has many)
+- No standard way to create PostgreSQL db/tear down db for the tests. No examples or standard way to create database tables for testing.
 
 - Documentation did not really cover how to use date columns properly. Are they strings? When they are date objects?
 
@@ -151,6 +157,8 @@ docker-compose down -v
 
 - NestJS: No idea how HTTP transaction retrying and PostgreSQL transaction conflict on the application level should be wired up - should be the default behavior in the name of safety
 
-- 
+- NestJS and TypeORM docs are not well indexed in Google - first hits point to the Github source
+
+
 
 

@@ -29,12 +29,18 @@ describe('User', () => {
     }).compile();
 
     app = module.createNestApplication();
+
     repository = module.get('UserRepository');
+
+    // https://stackoverflow.com/questions/60217131/typeorm-and-nestjs-creating-database-tables-at-the-beginning-of-an-e2e-test/60217528#60217528
+    const connection = repository.manager.connection;
+    // dropBeforeSync: If set to true then it drops the database with all its tables and data 
+    await connection.synchronize(true); 
+
     await app.init();
   });
 
   afterEach(async () => {
-    await repository.query(`DELETE FROM users;`);
   });
 
   afterAll(async () => {
@@ -43,8 +49,8 @@ describe('User', () => {
 
   describe('GET /users', () => {
     it('should return an array of users', async () => {
-      await repository.save([{ displayName: 'test-name-0' }, { displayName: 'test-name-1' }]);
-      
+      await repository.save([{ displayName: 'test-name-0', pendingEmail: "foobar@example.com" }, { displayName: 'test-name-1', pendingEmail: "foobar2@example.com" }]);
+
       const { body } = await supertest
         .agent(app.getHttpServer())
         .get('/users')
@@ -58,41 +64,4 @@ describe('User', () => {
     });
   });
 
-  describe('POST /users', () => {
-    it('should return a user', async () => {
-      const { body } = await supertest
-        .agent(app.getHttpServer())
-        .post('/users')
-        .set('Accept', 'application/json')
-        .send({ name: 'test-name' })
-        .expect('Content-Type', /json/)
-        .expect(201);
-      expect(body).toEqual({ id: expect.any(Number), name: 'test-name' });
-    });
-
-    it('should create a user is the DB', async () => {
-      await expect(repository.findAndCount()).resolves.toEqual([[], 0]);
-      await supertest
-        .agent(app.getHttpServer())
-        .post('/users')
-        .set('Accept', 'application/json')
-        .send({ name: 'test-name' })
-        .expect('Content-Type', /json/)
-        .expect(201);
-      await expect(repository.findAndCount()).resolves.toEqual([
-        [{ id: expect.any(Number), name: 'test-name' }],
-        1,
-      ]);
-    });
-
-    it('should handle a missing name', async () => {
-      await supertest
-        .agent(app.getHttpServer())
-        .post('/users')
-        .set('Accept', 'application/json')
-        .send({ none: 'test-none' })
-        .expect('Content-Type', /json/)
-        .expect(500);
-    });
-  });
 });
