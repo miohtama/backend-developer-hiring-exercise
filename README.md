@@ -44,17 +44,17 @@ Your task is to
   E.g. a valid column value would be `+358401231234` (Finland).
 
 - You *do not* need to check if the phone number is legit - e.g. if the country code exists.
-  This would be super difficult tasks as good heuristicss do not exist.
+  This would be super difficult tasks as good heuristics do not exist.
 
 - Update e2e tests to cover different phone number input cases - the API must gracefully handle different valid and invalid inputs
 
 - Create necessary migrations to upgrade the production database
 
 - In the pull request describe the changes and the actions that your colleagues need to understand: 
-  API migration instructions for frontend developers, database migration instructions for devop team
+  API migration instructions for frontend developers, database migration instructions for a devop team
 
 - For the extra impression, you can add other recommendations in the pull request commenting section. 
-  However, any code and style changes, should go to their own separate pull request.
+  However, any code and style changes, should go to its own separate pull request.
   The exercise pull request must consider only the task in the hand.
 
 ## How to submit the exercise
