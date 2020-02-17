@@ -112,13 +112,13 @@ Check it is up
 docker logs -f local_db
 ```
 
-Check that you get a database with `psql`
+Check that you can log into a database with `psql`
 
 ```bash
 docker exec -it local_db psql -U postgres 
 ```
 
-Create empty development database
+Create an empty development database:
 
 ```
 docker exec -it local_db psql -U local_dev -c "create database local_db" -d template1
@@ -132,7 +132,7 @@ Then do the local app installation
 npm install
 ```
 
-Generate `dist` folder (this will transpile .ts migrations to .js)
+Generata a `dist` folder (this will transpile .ts migrations to .js)
 
 ```bash
 npm run build
@@ -174,6 +174,12 @@ npm run start:dev
 # Database and migrations
 
 ## Automatically generating migrations
+
+You can generate migration files 
+
+1) After updating entity source code
+
+2) You have an up-to-date local development database
 
 ```bash
 
