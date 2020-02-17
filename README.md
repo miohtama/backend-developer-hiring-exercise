@@ -10,10 +10,10 @@
   * [Setting up a local app](#setting-up-a-local-app)
   * [Running the app](#running-the-app)
   * [Manual usage using Swagger](#manual-usage-using-swagger)
+- [Testing](#testing)
 - [Database and migrations](#database-and-migrations)
   * [Automatically generating migrations](#automatically-generating-migrations)
   * [Run migrations against a local db](#run-migrations-against-a-local-db)
-- [Testing](#testing)
 - [Troubleshooting](#troubleshooting)
   * [Restart database from the scratch](#restart-database-from-the-scratch)
   * [Display database content](#display-database-content)
@@ -171,6 +171,23 @@ npm run start:dev
 
 2. Confirm your email using `/users/confirm-email-admin`
 
+# Testing
+
+Please note that the server logger is not muted during these tests, so you get API errors logged in the console.
+
+Create the testing database (needs to be done only once).
+```bash
+docker exec -it local_db psql -U local_dev -c "create database e2e_test" local_db  
+```
+
+Run jest:
+```bash
+npm run test:e2e
+```
+
+We have only integration tests. No unit tests are available, or asked, in this exercise.
+
+
 # Database and migrations
 
 ## Automatically generating migrations
@@ -207,22 +224,6 @@ Check the result of migrations
 ```bash
 docker exec -it local_db psql -U local_dev -c "\dt" local_db
 ```
-
-# Testing
-
-Please note that the server logger is not muted during these tests, so you get API errors logged in the console.
-
-Create the testing database (needs to be done only once).
-```bash
-docker exec -it local_db psql -U local_dev -c "create database e2e_test" local_db  
-```
-
-Run jest:
-```bash
-npm run test:e2e
-```
-
-We have only integration tests. No unit tests are available, or asked, in this exercise.
 
 # Troubleshooting
 
