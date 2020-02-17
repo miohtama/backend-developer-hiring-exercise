@@ -15,6 +15,9 @@ export class RegisterUserDto {
     displayName: string;
 }
 
+export class ConfirmUserDto {
+    email: string;
+}
 
 export class ConfirmUserRegistrationDto {
     email: string;

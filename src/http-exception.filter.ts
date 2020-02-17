@@ -17,6 +17,8 @@ export class APIHttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = 500;
 
+    console.log(exception);
+
     response
       .status(status)
       .json({

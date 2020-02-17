@@ -69,13 +69,11 @@ export class UserService {
     /**
      * Check if the confirmed email alreaddy is there
      */
-    checkConfirmedEmail(email: string) { 
-
-        const existing = this.userRepository.findOneOrFail({confirmedEmail: email});
+    async checkConfirmedEmail(email: string) { 
+        const existing = await this.userRepository.findOne({confirmedEmail: email});
         if(existing) {
             throw new AlreadyConfirmedEmail(`The user with email ${email} is already confirmed`)
         }
-
     }
 
     // Make user to confirm their account on registration
@@ -91,7 +89,7 @@ export class UserService {
             now_ = new Date();
         }
                 
-        this.checkConfirmedEmail(email);
+        await this.checkConfirmedEmail(email);
 
         const record = await this.userRepository.findOneOrFail({pendingEmail: email})
 
@@ -125,14 +123,14 @@ export class UserService {
      * Use in testing - does not do error checking.
      * 
      */
-    async confirmEmailAdmin(email: string, now_:Date = null) {
+    async confirmEmailAdmin(email: string, now_:Date = null): Promise<User> {
 
         // Allow override time for testing
         if(!now_) {
             now_ = new Date();
         }        
 
-        this.checkConfirmedEmail(email);
+        await this.checkConfirmedEmail(email);
 
         const record = await this.userRepository.findOneOrFail({pendingEmail: email})
         record.confirmedEmail = record.pendingEmail;
@@ -147,7 +145,8 @@ export class UserService {
             throw ValidationAPIException.createFromValidationOutput(e);
         }        
 
-        this.userRepository.save(record);
+        await this.userRepository.save(record);
+        return record;
     }    
             
 }

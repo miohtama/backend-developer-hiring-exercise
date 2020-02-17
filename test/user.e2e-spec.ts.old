@@ -1,0 +1,120 @@
+import { INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import * as supertest from 'supertest';
+import { Repository, Connection, ConnectionOptionsReader } from 'typeorm';
+
+import { User } from '../src/user/user.entity';
+import { UserModule } from '../src/user/user.module';
+
+
+/**
+ * Rebuild empty database between tests.
+ */
+async function recreateDb(connection: Connection) {
+  console.log("Recreating the database");
+  // 
+  // await connection.dropDatabase();
+
+  // dropBeforeSync: If set to true then it drops the database with all its tables and data   
+}
+
+describe('User', () => {
+  let app: INestApplication;
+  let repository: Repository<User>;
+  let connection: Connection;
+
+  beforeAll(async () => {
+    const module = await Test.createTestingModule({
+      imports: [
+        UserModule,
+        TypeOrmModule.forRoot({
+          type: 'postgres',
+          host: 'localhost',
+          port: 54320,
+          username: 'local_dev',
+          password: 'local_dev',
+          database: 'e2e_test',
+          entities: ['./**/*.entity.ts'],
+          synchronize: false,
+        }),
+      ],
+    }).compile();
+
+    app = module.createNestApplication();
+
+    // https://stackoverflow.com/questions/60217131/typeorm-and-nestjs-creating-database-tables-at-the-beginning-of-an-e2e-test/60217528#60217528
+    connection = module.get(Connection);
+    await connection.synchronize(true);   
+
+    // await recreateDb(connection);
+
+    await app.init();
+  });
+
+  beforeEach(async (params) => {
+    // await recreateDb(connection);
+  });
+
+
+  afterEach(async (params) => {
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  describe('/users', () => {
+    
+    it('should register a new user', async () => {
+
+      const { body } = await supertest
+        .agent(app.getHttpServer())
+        .post('/users/register')
+        .send({
+          displayName: "Nooby Noob",
+          email: "nooby@example.com"
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(201);
+        // https://stackoverflow.com/a/47904961/315168
+        expect(body).toMatchObject({displayName: "Nooby Noob", email: "nooby@example.com"});
+
+
+      // Check that the opbject was persistent in the database
+      let [userOne] = await repository.find();
+      
+      expect(userOne.confirmedEmail).toBeNull(); // Separate call to confirmation needed
+      expect(userOne.pendingEmail).toBe("nooby@example.com");
+      expect(userOne.displayName).toBe("Nooby Noob");
+
+    });    
+
+    it('should not allow duplicate display names', async () => {
+
+      await supertest
+        .agent(app.getHttpServer())
+        .post('/users/register')
+        .send({
+          displayName: "Nooby Noob",
+          email: "nooby@example.com"
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(201);
+
+      await supertest
+        .agent(app.getHttpServer())
+        .post('/users/register')
+        .send({
+          displayName: "Nooby Noob",
+          email: "nooby@example.com"
+        })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(500);
+    });        
+
+  });
+});

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, UseFilters } from '@nestjs/common';
-import { RegisterUserDto, ConfirmUserRegistrationDto, ConfirmUserRegistrationAdminDto, UserOwnInfoDto } from './interfaces/user.dto';
+import { RegisterUserDto, ConfirmUserRegistrationDto, ConfirmUserRegistrationAdminDto, UserOwnInfoDto, ConfirmUserDto } from './interfaces/user.dto';
 import { UserService } from './user.service';
 import { ApiOperation, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { APIHttpExceptionFilter } from '../http-exception.filter';
@@ -9,11 +9,6 @@ import { APIHttpExceptionFilter } from '../http-exception.filter';
 export class UserController {
 
     constructor(private readonly userService: UserService) {}
-
-    @Get()
-    getUsers() {
-        return 'we get all dogs';
-    }    
 
     @Post('register')
     @ApiOperation({summary: "Register a new user"})
@@ -30,24 +25,24 @@ export class UserController {
         }
     }    
 
-    // Called after user clikcks a link in the confirmatino email
+    // Email token has been mailed to user.pendingEmail
     @Post('confirm-email')
     @ApiOkResponse({
         description: "Email confirmed"
     })    
     @ApiOperation({summary: "Confirm user registration with a verification email token"})
     confirmEmail(@Body() data: ConfirmUserRegistrationDto) {
-        this.userService.confirmEmail(data.email, data.token);        
+        throw new Error("Not implemented");
     }        
 
-    // 
     @Post('confirm-email-admin')
-    @ApiOkResponse({
-        description: "Email confirmed"
-    })
+    @ApiOkResponse()
     @ApiOperation({summary: "Integration test shortcut to confirm registered users"})
-    async confirmEmailAdmin(@Body() data: ConfirmUserRegistrationAdminDto) {
-        await this.userService.confirmEmailAdmin(data.email);        
+    async confirmEmailAdmin(@Body() data: ConfirmUserRegistrationAdminDto): Promise<ConfirmUserDto> {
+        let u = await this.userService.confirmEmailAdmin(data.email)
+        return {
+            email: u.confirmedEmail  // Emails get lowercased 
+        }
     }            
 }
 
