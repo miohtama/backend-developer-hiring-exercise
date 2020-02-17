@@ -1,3 +1,4 @@
+My notes on various issues with NestJS and TypeORM that might prevent new developers to get up to the speed.
 
 # NestJS - TypeORM shortcomings
 
