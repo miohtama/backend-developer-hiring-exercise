@@ -95,6 +95,8 @@ We do not recommend trying to undertake the exercise on native Windows.
 
 * You need to understand UNIX shell, TypeScript, Node.js, Docker, PostgreSQL 
 
+* This exercise was developed on Node v11.0.0
+
 # Installation
 
 ## Setting up PostgreSQL database
