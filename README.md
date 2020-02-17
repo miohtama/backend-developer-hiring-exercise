@@ -112,16 +112,16 @@ Check it is up
 docker logs -f local_db
 ```
 
-Check that you can log into a database with `psql`
-
-```bash
-docker exec -it local_db psql -U postgres 
-```
-
 Create an empty development database:
 
 ```
 docker exec -it local_db psql -U local_dev -c "create database local_db" -d template1
+```
+
+Check that you can log into a database with `psql`
+
+```bash
+docker exec -it local_db psql -U local_dev local_db
 ```
 
 ## Setting up a local app
