@@ -18,7 +18,8 @@ export class APIHttpExceptionFilter implements ExceptionFilter {
     const status = 500;
 
     // I could not make Jest + NestJS to capture server-side error logs only on failed tests,
-    // so we need to log out all errors here
+    // so we need to log out all errors here.
+    // Otherwise you won't see any server-side diagnostics when tests fail.
     console.log("Server-side exception capture (not necessarily a test error)", exception);
 
     response
