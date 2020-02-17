@@ -1,3 +1,26 @@
+- [Introduction](#introduction)
+- [Exercise](#exercise)
+  * [Your task](#your-task)
+  * [How to submit the exercise](#how-to-submit-the-exercise)
+  * [How you will be ranked](#how-you-will-be-ranked)
+- [Project description](#project-description)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+  * [Setting up PostgreSQL database](#setting-up-postgresql-database)
+  * [Setting up a local app](#setting-up-a-local-app)
+  * [Running the app](#running-the-app)
+  * [Manual usage using Swagger](#manual-usage-using-swagger)
+- [Database and migrations](#database-and-migrations)
+  * [Automatically generating migrations](#automatically-generating-migrations)
+  * [Run migrations against a local db](#run-migrations-against-a-local-db)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+  * [Restart database from the scratch](#restart-database-from-the-scratch)
+  * [Display database content](#display-database-content)
+  * [Debugging from Visual Studio Code](#debugging-from-visual-studio-code)
+  * [Launching Jest from Visual Studio Code](#launching-jest-from-visual-studio-code)
+- [Further reading](#further-reading)
+
 # Introduction
 
 This is a software development exercise for a TypeScript / Node.js backend developer position. 
@@ -6,9 +29,9 @@ This is a software development exercise for a TypeScript / Node.js backend devel
 
 - [Read more about our hiring process](https://github.com/miohtama/how-to-hire-developers)
 
-## Exercise
+# Exercise
 
-### Your task
+## Your task
 
 Your task is to 
 
@@ -34,7 +57,7 @@ Your task is to
   However, any code and style changes, should go to their own separate pull request.
   The exercise pull request must consider only the task in the hand.
 
-### How to submit the exercise
+## How to submit the exercise
 
 - [ ] Create a private copy of this Github repository
 - [ ] Complete the task above
@@ -42,7 +65,7 @@ Your task is to
 - [ ] Invite a Github user `miohtama` to your repository
 - [ ] Send email to `dev-careers@fb.io` that you have completed the exercise
 
-### How you will be ranked
+## How you will be ranked
 
 We will look
 
@@ -52,7 +75,7 @@ We will look
 - Code comment quality
 - Pull request commenting quality
 
-## Description
+# Project description
 
 This exercise is based on [NestJS](https://github.com/nestjs/nest) framework TypeScript starter project.
 
@@ -68,13 +91,13 @@ The local development flow is
 The development environment is tested on OSX, but should work on Linux systems unmodified. 
 We do not recommend trying to undertake the exercise on native Windows.
 
-## Prerequisites
+# Prerequisites
 
 * You need to understand UNIX shell, TypeScript, Node.js, Docker, PostgreSQL 
 
-## Installation
+# Installation
 
-### Setting up PostgreSQL database
+## Setting up PostgreSQL database
 
 This is will make a new PostgreSQL running in the standard port 5432. 
 Please shutdown any previous conflicting PostgreSQL instances before starting this.
@@ -101,7 +124,7 @@ Create empty development database
 docker exec -it local_db psql -U local_dev -c "create database local_db" -d template1
 ```
 
-### Setting up a local app
+## Setting up a local app
 
 Then do the local app installation
 
@@ -148,9 +171,9 @@ npm run start:dev
 
 2. Confirm your email using `/users/confirm-email-admin`
 
-## Database and migrations
+# Database and migrations
 
-### Automatically generating migrations
+## Automatically generating migrations
 
 ```bash
 
@@ -168,7 +191,7 @@ npm run start
 npm run migration:generate -- -n CreateUsers
 ```
 
-### Run migrations against a local db
+## Run migrations against a local db
 
 ```bash
 npm run migration:run
@@ -179,23 +202,27 @@ Check the result of migrations
 docker exec -it local_db psql -U local_dev -c "\dt" local_db
 ```
 
-## Test
+# Testing
 
-Running e2e tests. 
 Please note that the server logger is not muted during these tests, so you get API errors logged in the console.
 
+Create the testing database (needs to be done only once).
 ```bash
 docker exec -it local_db psql -U local_dev -c "create database e2e_test" local_db  
+```
+
+Run jest:
+```bash
 npm run test:e2e
 ```
 
-No unit tests are available, or asked in this exercise.
+We have only integration tests. No unit tests are available, or asked, in this exercise.
 
 # Troubleshooting
 
 ## Restart database from the scratch
 
-Nuking the local development database
+Nuking the local development database:
 
 ```bash
 docker-compose down -v
@@ -203,6 +230,7 @@ docker-compose down -v
 
 ## Display database content
 
+See what lurks in the user table:
 ```bash
 docker exec -it local_db psql -U local_dev -c "select * from users" local_db
 ```
