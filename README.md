@@ -62,6 +62,7 @@ Your task is to
 - [ ] Create a private copy of this Github repository
 - [ ] Complete the task above
 - [ ] Create a new pull request against your private repository
+- [ ] In the PR, write down number of hours you spent on this exercise (we do not use this to rank you, we use it to adjust the laborisity of future exercises)
 - [ ] Invite a Github user `miohtama` to your repository
 - [ ] Send email to `dev-careers@fb.io` that you have completed the exercise
 
