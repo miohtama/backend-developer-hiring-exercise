@@ -1,12 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, Generated, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import {IsEmail} from "class-validator";
 
-class ConfirmationEmailExpiredError extends Error {
-}    
-
-
-class ConfirmationEmailWrongToken extends Error {
-}    
 
 
 @Entity()
@@ -34,7 +28,7 @@ export class User {
    // (Randomized public ids make data exposure safer)
    @Column({unique: true})
    @Generated("uuid")
-   publidId: string;   
+   publicId: string;   
 
    // User's chosen nick, settable by the user
    @Column({length: 50, unique: true})
@@ -73,28 +67,6 @@ export class User {
     // Can this user login - the email registratoin is valid
     canLogIn(): boolean { 
         return this.emailConfirmationCompletedAt != null;
-    }
-
-    // Make user to confirm their account on registration
-    confirmEmail(email: string, token: string, now_:Date = null) {
-
-        // Allow override time for testing
-        if(!now_) {
-            now_ = new Date();
-        }
-
-        // Shitscript is shit, standard datetime sucks and no arithmetic methods
-        if(now_ > new Date(this.emailConfirmationRequestedAt.getTime() + User.EMAIL_CONFIRMATION_TIMEOUT_SECONDS)) {
-            throw new ConfirmationEmailExpiredError();
-        }
-
-        if(token != this.emailConfirmationToken) {
-            throw new ConfirmationEmailWrongToken();
-        }
-
-        this.confirmedEmail = this.pendingEmail;
-        this.emailConfirmationCompletedAt = now_;
-        this.emailConfirmationToken = null; 
     }
 
 }

@@ -11,10 +11,9 @@ The development flow here is
 * PostgreSQL databases running in a docker image: local development database, transient unit testing databases.
   PostgreSQL runs in non-default port 54320.
 
-* However, I find it personally easier just in install NestJS locally and use only the database from the Docker environment. Docker 
-  can be created scratch to run the tests from a clean slate.
+* App and NestJS is installed locally and use the database from the Docker environment.
 
-* The project uses [NestJS Swagger plugin for automatic interface generation](https://docs.nestjs.com/recipes/swagger#plugin)
+* The project uses [NestJS OpenAPI (Swagger) plugin for automatic interface generation](https://docs.nestjs.com/recipes/swagger#plugin).
 
 The development environment is tested on OSX, but should work on Linux systems unmodified.
 
@@ -74,7 +73,9 @@ Development
 npm run start
 ```
 
-Then visit http://localhost:3000 
+Then visit http://localhost:3000 to get the app landing page.
+
+Visit http://localhost:3000/api/ to get the Swagger generated REST API tool.
 
 Watch mode
 ```
