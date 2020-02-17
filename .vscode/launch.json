@@ -1,4 +1,6 @@
 // https://github.com/microsoft/vscode-recipes/tree/master/debugging-jest-tests
+// https://github.com/nestjs/typescript-starter/issues/37
+// https://stackoverflow.com/a/51295138/315168
 {
     "version": "0.2.0",
     "configurations": [
@@ -22,5 +24,17 @@
                 "PATH": "/Users/moo/.nvm/versions/node/v11.0.0/bin:${env:PATH}"
             },
         },
+
+    
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${workspaceFolder}\\src\\main.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        }        
     ]
 }

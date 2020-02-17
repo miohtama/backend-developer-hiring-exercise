@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
-import {Validator} from "class-validator";
+import {Validator, validateOrReject} from "class-validator";
 import { strict as assert } from 'assert';
-import { APISafeException } from '../apiexception';
+import { APISafeException, ValidationAPIException } from '../apiexception';
 
 
+// Some common error conditions
 class UserExists extends APISafeException {    
 }    
 
@@ -14,6 +15,9 @@ class ConfirmationEmailExpiredError extends APISafeException {
 }    
 
 class ConfirmationEmailWrongToken extends APISafeException {
+}
+
+class AlreadyConfirmedEmail extends APISafeException {
 }    
 
 
@@ -32,12 +36,12 @@ export class UserService {
         
         email = email.toLowerCase();
         
-        let existing = this.userRepository.findOne({confirmedEmail: email});
+        let existing = await this.userRepository.findOne({confirmedEmail: email});        
         if(existing) {
             throw new UserExists(`The user with email ${email} exists`)
         }
 
-        existing = this.userRepository.findOne({displayName});
+        existing = await this.userRepository.findOne({displayName});
         if(existing) {
             throw new UserExists(`The user with name ${displayName} exists`)
         }
@@ -46,11 +50,32 @@ export class UserService {
         u.displayName = displayName;
         u.pendingEmail = email;
         u.emailConfirmationRequestedAt = new Date();
+        // https://stackoverflow.com/a/47496558/315168
+        u.emailConfirmationToken = [...Array(16)].map(() => Math.random().toString(36)[2]).join(''); // TODO: Add a crypto secure user reasdable random token
 
-        // We do not have any email out integration in this execrise
-
+        // Run application level validators like IsEmail()
+        try {
+            await validateOrReject(u);
+        } catch(e) {
+            // Convert to friendlier exception
+            throw ValidationAPIException.createFromValidationOutput(e);
+        }
+        
+        // We do not have any email out integration in this execrise        
         await this.userRepository.save(u);
         return u;
+    }
+
+    /**
+     * Check if the confirmed email alreaddy is there
+     */
+    checkConfirmedEmail(email: string) { 
+
+        const existing = this.userRepository.findOneOrFail({confirmedEmail: email});
+        if(existing) {
+            throw new AlreadyConfirmedEmail(`The user with email ${email} is already confirmed`)
+        }
+
     }
 
     // Make user to confirm their account on registration
@@ -66,10 +91,7 @@ export class UserService {
             now_ = new Date();
         }
                 
-        const existing = this.userRepository.findOneOrFail({confirmedEmail: email});
-        if(existing) {
-            throw new UserExists(`The user with email ${email} exists`)
-        }
+        this.checkConfirmedEmail(email);
 
         const record = await this.userRepository.findOneOrFail({pendingEmail: email})
 
@@ -85,6 +107,14 @@ export class UserService {
         record.confirmedEmail = record.pendingEmail;
         record.emailConfirmationCompletedAt = now_;
         record.emailConfirmationToken = null; 
+
+        // Run application level validators like IsEmail()
+        try {
+            await validateOrReject(record);
+        } catch(e) {
+            // Convert to friendlier exception
+            throw ValidationAPIException.createFromValidationOutput(e);
+        }              
 
         this.userRepository.save(record);
 
@@ -102,10 +132,20 @@ export class UserService {
             now_ = new Date();
         }        
 
+        this.checkConfirmedEmail(email);
+
         const record = await this.userRepository.findOneOrFail({pendingEmail: email})
         record.confirmedEmail = record.pendingEmail;
         record.emailConfirmationCompletedAt = now_;
         record.emailConfirmationToken = null; 
+
+        // Run application level validators like IsEmail()
+        try {
+            await validateOrReject(record);
+        } catch(e) {
+            // Convert to friendlier exception
+            throw ValidationAPIException.createFromValidationOutput(e);
+        }        
 
         this.userRepository.save(record);
     }    

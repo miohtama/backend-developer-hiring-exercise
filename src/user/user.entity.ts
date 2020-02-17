@@ -1,9 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, Generated, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import {IsEmail} from "class-validator";
+import {IsEmail, IsOptional} from "class-validator";
 
 
 
-@Entity()
+// user is a reserved name in PostgreSQL
+@Entity("site_user")
 export class User {
 
     static EMAIL_CONFIRMATION_TIMEOUT_SECONDS = 3*24*3600;
@@ -36,6 +37,7 @@ export class User {
 
    // Set after the email verification completes
    @Column({length: 50, nullable: true, unique: true})
+   @IsOptional()
    @IsEmail()
    confirmedEmail: string;
 
@@ -45,8 +47,7 @@ export class User {
    pendingEmail: string;
 
    // Set after the email verification completes
-   @Column({length: 8, nullable: true})
-   @IsEmail()
+   @Column({length: 16, nullable: true, unique: true})
    emailConfirmationToken: string;
 
     // When the user registerd / requested email change

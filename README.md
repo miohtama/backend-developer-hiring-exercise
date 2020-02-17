@@ -78,13 +78,14 @@ Then visit http://localhost:3000 to get the app landing page.
 Visit http://localhost:3000/api/ to get the Swagger generated REST API tool.
 
 Watch mode
-```
+
+```bash
 npm run start:dev
 ```
 
 Production mode
 
-```
+```bash
 npm run start:prod
 ```
 
@@ -93,6 +94,18 @@ npm run start:prod
 ### Automatically generating migrations
 
 ```bash
+
+# Make sure we have not stale JS transpilation code around
+rm -rf dist
+
+# Rebuild transpilation
+npm run build  
+
+# You need to start the dev server to generate dist/migrations 
+# NestJS bug https://github.com/nrwl/nx/issues/1393
+npm run start
+
+# Create a file under migration/
 npm run migration:generate -- -n CreateUsers
 ```
 
@@ -129,17 +142,34 @@ Running a single test
 npm run test:e2e -- -t "GET /users"
 ```
 
-# test coverage
-$ npm run test:cov
-```
-
 # Troubleshooting
+
+## Restart database from the scratch
 
 Nuking the local development database
 
-```sh
+```bash
 docker-compose down -v
-````
+```
+
+## Display database content
+
+```bash
+docker exec -it local_db psql -U local_dev -c "select * from users" local_db
+```
+
+## Debugging from Visual Studio Code
+
+Visual Studio Code Auto [Attach feature] works.
+
+You just need to run 
+
+```bash
+npm run start:debug
+```
+
+... and Visual Studio Code will notice this and the debugger bar appears. All breakpoints are honoured.
+
 
 # Further reading
 
@@ -160,7 +190,7 @@ docker-compose down -v
 # NestJS - TypeORM shortcomings
 
 - TypeScript transpiling causes slowdown and all kind of funny errors as seen below. I hope we will have a Node that can directly
-  execute TypeScript without having these issues in the future.
+  execute TypeScript without having these issues in the future. See https://www.google.com/search?hl=en&q=%22SyntaxError%3A%20Unexpected%20token%20%7B%22%20nestjs%20migrations
 
 - No standard way to create PostgreSQL db/tear down db for the tests. No examples or standard way to create database tables for testing.
 
@@ -178,6 +208,10 @@ docker-compose down -v
 
 - NestJS: Some error messages need to be made more helpful and initialisation needs to add checks for the common errors. E.g. I was accidentally providing some 
   service in both app module and its own module, but the error message was misleading.
+
+- NestKS + TypeORM: The default project generator and structure breaks down when a migration is created https://github.com/nrwl/nx/issues/1393
+
+- Swagger documentation is lacking. E.g. here is the list of methods, but no link or further link to the API documentation: https://docs.nestjs.com/recipes/swagger#decorators
 
 ## Confusing errors I got
 
