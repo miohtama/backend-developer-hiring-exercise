@@ -241,7 +241,7 @@ docker-compose down -v
 
 See what lurks in the user table:
 ```bash
-docker exec -it local_db psql -U local_dev -c "select * from users" local_db
+docker exec -it local_db psql -U local_dev -c "select * from site_user" local_db
 ```
 
 ## Debugging from Visual Studio Code

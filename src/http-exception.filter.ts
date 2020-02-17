@@ -17,7 +17,7 @@ export class APIHttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = 500;
 
-    console.log(exception);
+    console.log("Server-side exception capture (not necessarily a test error)", exception);
 
     response
       .status(status)
