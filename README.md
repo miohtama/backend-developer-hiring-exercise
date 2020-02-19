@@ -41,10 +41,7 @@ Your task is to
 
 - The field must save a normalised (i.e: no spaces or other separator characters) international phone number in the database.
   Technically, this is called MSISDN format. Please save the plus character prefix in the database.
-  E.g. a valid column value would be `+358401231234` (Finland).
-
-- You *do not* need to check if the phone number is legit - e.g. if the country code exists.
-  This would be super difficult tasks as good heuristics do not exist.
+  E.g. a valid column value would be `+358401231234` (Finland). 
 
 - Update e2e tests to cover different phone number input cases - the API must gracefully handle different valid and invalid inputs
 
