@@ -112,11 +112,6 @@ Check it is up
 docker logs -f local_db
 ```
 
-Create an empty development database:
-
-```
-docker exec -it local_db psql -U local_dev -c "create database local_db" -d template1
-```
 
 Check that you can log into a database with `psql`
 
