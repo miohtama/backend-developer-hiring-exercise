@@ -203,9 +203,6 @@ You can generate migration files
 
 ```bash
 
-# Make sure we have not stale JS transpilation code around
-rm -rf dist
-
 # Rebuild transpilation
 npm run build  
 
@@ -243,6 +240,11 @@ docker-compose down -v
 See what lurks in the user table:
 ```bash
 docker exec -it local_db psql -U local_dev -c "select * from site_user" local_db
+```
+
+And for the e2e DB:
+```bash
+docker exec -it local_db psql -U local_dev -c "select * from site_user" e2e_test
 ```
 
 ## Debugging from Visual Studio Code
